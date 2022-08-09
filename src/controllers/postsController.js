@@ -2,12 +2,11 @@ import { createPost } from "../repositories/postsRepository.js";
 
 export async function newPost(req, res) {
   const { url, description } = req.body;
-  //Trocar depois para adequar a forma que o token estiver armazenando a id do usuário
-  const userId = userData.id || userData.userId;
+  const { id } = res.locals.userData;
   const postData = {
     url,
     description,
-    userId,
+    userId: id,
   };
   try {
     await createPost(postData);
