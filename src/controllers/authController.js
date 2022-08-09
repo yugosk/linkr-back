@@ -6,7 +6,7 @@ export async function signUp(req, res) {
   const { email, password, username, picture } = req.body;
 
   try {
-    const { rowCount } = await findUser(email);
+    const { rowCount } = await findUser(email, username);
 
     if (rowCount !== 0) return res.status(409).send("Cannot create user");
 
