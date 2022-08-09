@@ -1,4 +1,4 @@
-export function schemaMiddleware(schema) {
+export async function schemaMiddleware(schema) {
   return (req, res, next) => {
     const { error } = schema.validate(req.body, { abortEarly: false });
     if (error) {
