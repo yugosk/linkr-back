@@ -1,6 +1,11 @@
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
-import { findUser, createUser } from "../repositories/authRepository.js";
+import {
+  findUser,
+  findUserByEmail,
+  createUser,
+} from "../repositories/authRepository.js";
 
 export async function signUp(req, res) {
   const { email, password, username, picture } = req.body;
@@ -19,5 +24,33 @@ export async function signUp(req, res) {
   } catch (err) {
     console.log(err);
     res.status(500).send("Error while creating new user");
+  }
+}
+
+export async function signIn(req, res) {
+  const { email, password } = req.body;
+
+  try {
+    const {
+      rowCount,
+      rows: [user],
+    } = await findUserByEmail(email);
+
+    if (rowCount === 0) {
+      return res.status(401).send("Invalid email or password");
+    }
+
+    if (!bcrypt.compareSync(password, user.password)) {
+      return res.status(401).send("Invalid email or password");
+    }
+
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    res.status(200).send({ token, picture: user.picture });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error while loggin in user");
   }
 }

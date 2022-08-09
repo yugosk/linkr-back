@@ -7,6 +7,10 @@ export async function findUser(email, username) {
   );
 }
 
+export async function findUserByEmail(email) {
+  return connection.query("SELECT * FROM users WHERE email = $1", [email]);
+}
+
 export async function createUser(email, password, username, picture) {
   connection.query(
     "INSERT INTO users (email, password, username, picture) VALUES ($1, $2, $3, $4)",
