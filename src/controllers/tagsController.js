@@ -12,9 +12,9 @@ export async function trending(req,res){
 }
 
 export async function hashtagPage(req,res){
-    const { tagName } = req.params;
+    const { hashtag } = req.params;
     try{
-        const listPosts  = await postsWithTag(tagName);
+        const listPosts  = await postsWithTag(hashtag);
         res.status(201).send(listPosts);
     }
     catch(error){
