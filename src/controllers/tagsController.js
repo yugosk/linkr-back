@@ -1,4 +1,4 @@
-import { trendingHashtags, tagPage } from "../repositories/tagsRepository";
+import { trendingHashtags, postsWithTag } from "../repositories/tagsRepository.js";
 
 export async function trending(req,res){
     try{
@@ -12,10 +12,10 @@ export async function trending(req,res){
 }
 
 export async function hashtagPage(req,res){
-    const { tagId } = req.body;
+    const { tagName } = req.params;
     try{
-        const objPageHashtag  = await tagPage(tagId);
-        res.status(201).send(objPageHashtag);
+        const listPosts  = await postsWithTag(tagName);
+        res.status(201).send(listPosts);
     }
     catch(error){
         res.status(500).send('Unable to obtain posts for hashtag');
