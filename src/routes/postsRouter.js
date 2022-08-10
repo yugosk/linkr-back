@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { newPost } from "../controllers/postsController.js";
+import { newPost, getPosts } from "../controllers/postsController.js";
 import { schemaMiddleware } from "../middlewares/schemaMiddleware.js/schemaMiddleware.js";
 import { postSchema } from "../schemas/postSchema.js";
 import { validateToken } from "../middlewares/authMiddleware/authMiddleware.js";
@@ -12,5 +12,7 @@ postsRouter.post(
   schemaMiddleware(postSchema),
   newPost
 );
+
+postsRouter.get("/posts", validateToken, getPosts);
 
 export default postsRouter;
