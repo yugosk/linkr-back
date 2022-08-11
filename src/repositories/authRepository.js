@@ -17,3 +17,18 @@ export async function createUser(email, password, username, picture) {
     [email, password, username, picture]
   );
 }
+
+export async function findUsers(name) {
+  let pattern = "";
+  const params = [];
+
+  if (name) {
+    params.push(`${name}%`);
+    pattern = "WHERE username ILIKE $1";
+  }
+
+  return connection.query(
+    `SELECT id, username, picture FROM users ${pattern} ORDER BY username`,
+    params
+  );
+}
