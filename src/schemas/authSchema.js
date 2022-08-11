@@ -7,4 +7,9 @@ const newUserSchema = joi.object({
   picture: joi.string().uri().required(),
 });
 
-export { newUserSchema };
+const userSchema = joi.object({
+  email: joi.string().email().required(),
+  password: joi.string().required(),
+});
+
+export { newUserSchema, userSchema };
