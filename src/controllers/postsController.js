@@ -44,8 +44,7 @@ export async function newPost(req, res) {
       }
       return res.status(201).send("Post created successfully");
     }
-  } catch (error) {
-    console.error(error);
+  } catch {
     res.sendStatus(500);
   }
 }
@@ -79,7 +78,6 @@ export async function getPosts(req, res) {
   try {
     const posts = await readPosts();
     const response = await Promise.all(posts.map((post) => mapMetadata(post)));
-    console.log(await testandoDB());
     res.send(response);
   } catch {
     res.sendStatus(500);
