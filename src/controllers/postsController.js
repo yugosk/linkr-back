@@ -1,6 +1,5 @@
 import { createPost, readPosts } from "../repositories/postsRepository.js";
 import urlMetadata from "url-metadata";
-import { renderMatches } from "react-router-dom";
 
 export async function newPost(req, res) {
   const { url, description } = req.body;
