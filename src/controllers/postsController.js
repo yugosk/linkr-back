@@ -52,17 +52,21 @@ export async function newPost(req, res) {
   }
 }
 
-async function mapMetadata(obj) {
+async function mapMetadata(obj, userId) {
   const likes = await readLikes();
   const postLikes = likes
     .filter((i) => i.postId === obj.id)
     .map((i) => {
       return { username: i.username, userId: i.id };
     });
+  let isLiked = false;
+  if (postLikes.find((i) => i.userId === userId)) {
+    isLiked = true;
+  }
   try {
     const meta = await urlMetadata(obj.url);
-    likes.filter((i) => i.postId === obj.id);
     return {
+      id: obj.id,
       username: obj.username,
       picture: obj.picture,
       description: obj.description,
@@ -71,9 +75,11 @@ async function mapMetadata(obj) {
       metaImage: meta.image,
       metaDescription: meta.description,
       likes: postLikes,
+      isLiked,
     };
   } catch {
     return {
+      id: obj.id,
       username: obj.username,
       picture: obj.picture,
       description: obj.description,
@@ -82,16 +88,21 @@ async function mapMetadata(obj) {
       metaImage: "Metadata not available",
       metaDescription: "Metadata not available",
       likes: postLikes,
+      isLiked,
     };
   }
 }
 
 export async function getPosts(req, res) {
+  const userId = res.locals.userId;
   try {
     const posts = await readPosts();
-    const response = await Promise.all(posts.map((post) => mapMetadata(post)));
+    const response = await Promise.all(
+      posts.map((post) => mapMetadata(post, userId))
+    );
     res.send(response);
-  } catch {
+  } catch (error) {
+    console.error(error);
     res.sendStatus(500);
   }
 }
