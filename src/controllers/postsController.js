@@ -1,9 +1,12 @@
-import { createPost, readPosts } from "../repositories/postsRepository.js";
+import {
+  createPost,
+  readPosts,
+  readLikes,
+} from "../repositories/postsRepository.js";
 import {
   createTag,
   createTagsPosts,
   readTags,
-  testandoDB,
 } from "../repositories/tagsRepository.js";
 import urlMetadata from "url-metadata";
 
@@ -50,8 +53,15 @@ export async function newPost(req, res) {
 }
 
 async function mapMetadata(obj) {
+  const likes = await readLikes();
+  const postLikes = likes
+    .filter((i) => i.postId === obj.id)
+    .map((i) => {
+      return { username: i.username, userId: i.id };
+    });
   try {
     const meta = await urlMetadata(obj.url);
+    likes.filter((i) => i.postId === obj.id);
     return {
       username: obj.username,
       picture: obj.picture,
@@ -60,6 +70,7 @@ async function mapMetadata(obj) {
       metaTitle: meta.title,
       metaImage: meta.image,
       metaDescription: meta.description,
+      likes: postLikes,
     };
   } catch {
     return {
@@ -70,6 +81,7 @@ async function mapMetadata(obj) {
       metaTitle: "Metadata not available",
       metaImage: "Metadata not available",
       metaDescription: "Metadata not available",
+      likes: postLikes,
     };
   }
 }

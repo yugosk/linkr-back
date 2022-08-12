@@ -11,10 +11,20 @@ export async function createPost(post) {
 
 export async function readPosts() {
   const { rows: response } = await connection.query(`
-  SELECT p.url, p.description, u.picture, u.username FROM posts p
+  SELECT p.url, p.description, p.id, u.picture, u.username FROM posts p
   JOIN users u ON u.id = p."userId"
   ORDER BY p."createdAt" DESC
   LIMIT 20
   `);
+  return response;
+}
+
+export async function readLikes() {
+  const { rows: response } = await connection.query(
+    `
+  SELECT u.username, u.id, "postId" FROM likes
+  JOIN users u ON u.id = "userId"
+  `
+  );
   return response;
 }
