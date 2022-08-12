@@ -48,7 +48,7 @@ export async function signIn(req, res) {
       expiresIn: "1h",
     });
 
-    res.status(200).send({ token, picture: user.picture });
+    res.status(200).send({ token, picture: user.picture, userId: user.id });
   } catch (err) {
     console.log(err);
     res.status(500).send("Error while loggin in user");
