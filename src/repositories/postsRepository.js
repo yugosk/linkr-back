@@ -11,7 +11,7 @@ export async function createPost(post) {
 
 export async function readPosts() {
   const { rows: response } = await connection.query(`
-  SELECT p.url, p.description, u.picture, u.username, p."userId" FROM posts p
+  SELECT p.url, p.description, u.picture, u.username, p.id, p."userId" FROM posts p
   JOIN users u ON u.id = p."userId"
   ORDER BY p."createdAt" DESC
   LIMIT 20

@@ -48,10 +48,3 @@ export async function postsWithTag(tagName){
     LIMIT 20`,[tagName]);
     return (listPosts);
 }
-
-export async function testandoDB() {
-  const { rows: response } = await connection.query(`
-        SELECT * FROM tags;
-    `);
-  return response;
-}
