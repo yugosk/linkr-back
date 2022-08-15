@@ -1,6 +1,6 @@
 import { Router } from "express";
 import likeSchema from "../schemas/likeSchema.js";
-import { schemaMiddleware } from "../middlewares/schemaMiddleware.js/schemaMiddleware.js";
+import { schemaMiddleware } from "../middlewares/schemaMiddleware/schemaMiddleware.js";
 import { removeLike, postLike } from "../controllers/likesControllers.js";
 
 const likesRouter = Router();

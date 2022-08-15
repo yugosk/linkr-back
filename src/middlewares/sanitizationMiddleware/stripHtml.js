@@ -11,8 +11,5 @@ export default function stripStringHtml(req, res, next) {
 
   res.locals.sanitezedBody = body;
 
-  console.log(req.body);
-  console.log(body);
-
   next();
 }
