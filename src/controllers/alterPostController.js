@@ -23,10 +23,12 @@ export async function deletePost(req,res){
     if (!postId){
         return res.sendStatus(404);
     }
-    let { id } = res.locals.userData;
+    let id = res.locals.userId;
     try {
         let {userId} = await checkOwner(postId);
         userId = parseInt(userId);
+
+        console.log(id);
         id = parseInt(id);
         if (userId !== id){
             return res.status(401).send('Post does not belong to user');
