@@ -2,10 +2,11 @@ import connection from "../databases/pgsql.js";
 
 export async function createPost(post) {
   const { url, description, userId } = post;
-  await connection.query(
-    `INSERT INTO posts (url, description, "userId", "createdAt") VALUES ($1, $2, $3, NOW())`,
+  const { rows: response } = await connection.query(
+    `INSERT INTO posts (url, description, "userId", "createdAt") VALUES ($1, $2, $3, NOW()) RETURNING id`,
     [url, description, userId]
   );
+  return response[0].id;
 }
 
 export async function readPosts() {
@@ -15,5 +16,15 @@ export async function readPosts() {
   ORDER BY p."createdAt" DESC
   LIMIT 20
   `);
+  return response;
+}
+
+export async function readLikes() {
+  const { rows: response } = await connection.query(
+    `
+  SELECT u.username, u.id, "postId" FROM likes
+  JOIN users u ON u.id = "userId"
+  `
+  );
   return response;
 }

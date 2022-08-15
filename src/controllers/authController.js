@@ -8,7 +8,7 @@ import {
 } from "../repositories/authRepository.js";
 
 export async function signUp(req, res) {
-  const { email, password, username, picture } = req.body;
+  const { email, password, username, picture } = res.locals.sanitezedBody;
 
   try {
     const { rowCount } = await findUser(email, username);
@@ -28,7 +28,7 @@ export async function signUp(req, res) {
 }
 
 export async function signIn(req, res) {
-  const { email, password } = req.body;
+  const { email, password } = res.locals.sanitezedBody;
 
   try {
     const {
@@ -48,7 +48,7 @@ export async function signIn(req, res) {
       expiresIn: "1h",
     });
 
-    res.status(200).send({ token, picture: user.picture });
+    res.status(200).send({ token, picture: user.picture, userId: user.id });
   } catch (err) {
     console.log(err);
     res.status(500).send("Error while loggin in user");

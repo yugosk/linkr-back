@@ -1,13 +1,19 @@
 import { Router } from "express";
 
-import { schemaMiddleware } from "../middlewares/schemaMiddleware.js/schemaMiddleware.js";
+import stripStringHtml from "../middlewares/sanitizationMiddleware/stripHtml.js";
+import { schemaMiddleware } from "../middlewares/schemaMiddleware/schemaMiddleware.js";
 import { signUp, signIn } from "../controllers/authController.js";
 
 import { newUserSchema, userSchema } from "../schemas/authSchema.js";
 
 const router = Router();
 
-router.post("/signup", schemaMiddleware(newUserSchema), signUp);
-router.post("/signin", schemaMiddleware(userSchema), signIn);
+router.post(
+  "/signup",
+  stripStringHtml,
+  schemaMiddleware(newUserSchema),
+  signUp
+);
+router.post("/signin", stripStringHtml, schemaMiddleware(userSchema), signIn);
 
 export default router;
