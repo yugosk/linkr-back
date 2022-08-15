@@ -19,7 +19,7 @@ export async function editPost(req,res){
 }
 
 export async function deletePost(req,res){
-    const { postId } = req.body;
+    const { postId } = req.params;
     if (!postId){
         return res.sendStatus(404);
     }

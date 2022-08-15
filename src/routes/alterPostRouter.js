@@ -7,6 +7,6 @@ import { editSchema } from "../schemas/editSchema.js";
 
 const router = Router();
 router.put("/editing",validateToken,schemaMiddleware(editSchema), editPost);
-router.delete("/deleting",validateToken,deletePost);
+router.delete("/deleting/:postId",validateToken,deletePost);
 
 export default router;
