@@ -7,7 +7,7 @@ export async function validateToken(req, res, next) {
 
   try {
     const userData = jwt.verify(token, secret);
-    res.locals.userData = userData;
+    res.locals.userId = userData.id;
     next();
   } catch {
     res.status(401).send("Invalid token");
