@@ -2,22 +2,22 @@ import { createLike, deleteLike } from "../repositories/likesRepository.js";
 
 export async function postLike(req, res) {
   const { postId } = req.params;
-  const { userId } = req.body;
+  const userId = res.locals.userId;
   try {
     await createLike(postId, userId);
     res.sendStatus(201);
-  } catch {
+  } catch (error) {
     res.sendStatus(500);
   }
 }
 
 export async function removeLike(req, res) {
   const { postId } = req.params;
-  const { userId } = req.query;
+  const userId = res.locals.userId;
   try {
     await deleteLike(postId, userId);
     res.sendStatus(200);
-  } catch {
+  } catch (error) {
     res.sendStatus(500);
   }
 }

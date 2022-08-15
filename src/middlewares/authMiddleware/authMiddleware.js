@@ -9,7 +9,8 @@ export async function validateToken(req, res, next) {
     const userData = jwt.verify(token, secret);
     res.locals.userId = userData.id;
     next();
-  } catch {
+  } catch (err) {
+    console.error(err);
     res.status(401).send("Invalid token");
   }
 }
