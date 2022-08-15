@@ -44,6 +44,19 @@ export async function createTagsPosts(tagId, postId) {
   );
 }
 
+
+export async function postsWithTag(tagName){
+    const { rows:listPosts } = await connection.query(
+    `SELECT users.picture, users.username, posts.id, posts.url, posts.description, posts."userId", posts."createdAt" FROM posts 
+    JOIN "tagsPosts" ON posts.id="tagsPosts"."postId" 
+    JOIN users on posts."userId"=users.id
+    JOIN tags ON "tagsPosts"."tagId"=tags.id 
+    WHERE tags.name=$1
+    ORDER BY posts."createdAt" DESC
+    LIMIT 20`,[tagName]);
+    return (listPosts);
+}
+
 export async function testandoDB() {
   const { rows: response } = await connection.query(`
         SELECT * FROM tags;
