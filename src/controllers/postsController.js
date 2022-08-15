@@ -11,7 +11,7 @@ import {
 import urlMetadata from "url-metadata";
 
 export async function newPost(req, res) {
-  const { url, description } = req.body;
+  const { url, description } = res.locals.sanitezedBody;
   const { id } = res.locals.userData;
   const postData = {
     url,
