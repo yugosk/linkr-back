@@ -29,39 +29,27 @@ export async function createNewFollower(req, res) {
       return res.status(409).send("Already following this user");
     }
 
-    await createFollow(followedId, followerId);
+    const {
+      rows: [follow],
+    } = await createFollow(followedId, followerId);
 
-    res.status(201).send();
+    res.status(201).send(follow);
   } catch {
     res.status(500).send("Error while creating new follower");
   }
 }
 
 export async function deleteFollower(req, res) {
-  const { userId: followerId } = res.locals;
-  const { id: followedId } = req.params;
-
-  if (followerId === Number(followedId)) {
-    return res.status(409).send("Cannot unfollow yourself");
-  }
+  const { id } = req.params;
 
   try {
-    const { rowCount: userRowCount } = await findUserById(followedId);
+    const { rowCount } = await findFollow({ id });
 
-    if (userRowCount === 0) {
-      return res.status(404).send("Cannot unfollow a user who does not exist");
+    if (rowCount === 0) {
+      return res.status(404).send("Not found specified follow");
     }
 
-    const { rowCount: followRowCount } = await findFollow({
-      followedId,
-      followerId,
-    });
-
-    if (followRowCount === 0) {
-      return res.status(409).send("Not following this user yet");
-    }
-
-    await deleteFollow(followedId, followerId);
+    await deleteFollow(id);
 
     res.status(200).send();
   } catch {
@@ -70,13 +58,11 @@ export async function deleteFollower(req, res) {
 }
 
 export async function getFollow(req, res) {
-  const query = req.query;
-
   try {
-    const { rows: follow } = await findFollow(query);
+    const { rows: follow } = await findFollow(req.query);
 
     res.status(200).send(follow);
-  } catch (err) {
-    res.status(500).send(err.message);
+  } catch {
+    res.status(500).send("Error while getting follows");
   }
 }

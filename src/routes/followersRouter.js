@@ -11,6 +11,7 @@ import {
 
 const router = Router();
 
+router.get("/", validateToken, getFollow);
 router.post(
   "/",
   validateToken,
@@ -18,7 +19,6 @@ router.post(
   createNewFollower
 );
 
-router.get("/", validateToken, getFollow);
 router.delete("/:id", validateToken, deleteFollower);
 
 export default router;

@@ -1,9 +1,9 @@
 import connection from "../databases/pgsql.js";
 
-export async function findFollow(query) {
+export async function findFollow(whereParams) {
   const params = [];
 
-  const whereClause = Object.entries(query).reduce((prev, cur) => {
+  const whereClause = Object.entries(whereParams).reduce((prev, cur) => {
     params.push(cur[1]);
     return `${prev}${prev === "" ? "WHERE" : "AND"} "${cur[0]}" = $${
       params.length
@@ -15,14 +15,11 @@ export async function findFollow(query) {
 
 export async function createFollow(followedId, followerId) {
   return connection.query(
-    'INSERT INTO followers ("followedId", "followerId") VALUES ($1, $2)',
+    'INSERT INTO followers ("followedId", "followerId") VALUES ($1, $2) RETURNING id',
     [followedId, followerId]
   );
 }
 
-export async function deleteFollow(followedId, followerId) {
-  return connection.query(
-    'DELETE FROM followers WHERE "followedId" = $1 AND "followerId" = $2',
-    [followedId, followerId]
-  );
+export async function deleteFollow(id) {
+  return connection.query("DELETE FROM followers WHERE id = $1", [id]);
 }
