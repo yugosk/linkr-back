@@ -13,3 +13,10 @@ export async function createFollow(followedId, followerId) {
     [followedId, followerId]
   );
 }
+
+export async function deleteFollow(followedId, followerId) {
+  return connection.query(
+    'DELETE FROM followers WHERE "followedId" = $1 AND "followerId" = $2',
+    [followedId, followerId]
+  );
+}
