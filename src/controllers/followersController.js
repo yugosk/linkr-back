@@ -58,8 +58,14 @@ export async function deleteFollower(req, res) {
 }
 
 export async function getFollow(req, res) {
+  const { userId: followerId } = res.locals;
+  const { followedId } = req.query;
+
   try {
-    const { rows: follow } = await findFollow(req.query);
+    const { rows: follow } = await findFollow({
+      followedId,
+      followerId,
+    });
 
     res.status(200).send(follow);
   } catch {

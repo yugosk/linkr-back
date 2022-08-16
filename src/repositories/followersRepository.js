@@ -4,6 +4,8 @@ export async function findFollow(whereParams) {
   const params = [];
 
   const whereClause = Object.entries(whereParams).reduce((prev, cur) => {
+    if (!cur[1]) return prev;
+
     params.push(cur[1]);
     return `${prev}${prev === "" ? "WHERE" : "AND"} "${cur[0]}" = $${
       params.length
