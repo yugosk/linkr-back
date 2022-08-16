@@ -68,3 +68,15 @@ export async function deleteFollower(req, res) {
     res.status(500).send("Error while deleting follower");
   }
 }
+
+export async function getFollow(req, res) {
+  const query = req.query;
+
+  try {
+    const { rows: follow } = await findFollow(query);
+
+    res.status(200).send(follow);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+}
