@@ -7,6 +7,7 @@ import usersRouter from "./usersRouter.js";
 import alterPostRouter from "./alterPostRouter.js";
 import userPostsRouter from "./userPostsRouter.js";
 import likesRouter from "./likesRouter.js";
+import followersRouter from "./followersRouter.js";
 
 const router = Router();
 
@@ -14,8 +15,9 @@ router.use("/", authRouter);
 router.use("/", tagsRouter);
 router.use("/", postsRouter);
 router.use("/users", usersRouter);
-router.use("/",alterPostRouter);
-router.use("/",userPostsRouter);
+router.use("/", alterPostRouter);
+router.use("/", userPostsRouter);
 router.use("/", likesRouter);
+router.use("/followers", followersRouter);
 
 export default router;
