@@ -1,5 +1,9 @@
 import connection from "../databases/pgsql.js";
 
+export async function findPost(postId) {
+  return connection.query("SELECT * FROM posts WHERE id = $1", [postId]);
+}
+
 export async function createPost(post) {
   const { url, description, userId } = post;
   const { rows: response } = await connection.query(

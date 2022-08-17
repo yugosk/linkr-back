@@ -9,6 +9,7 @@ import commentSchema from "../schemas/commentSchema.js";
 import {
   newPost,
   getPosts,
+  getPostComments,
   createNewComment,
 } from "../controllers/postsController.js";
 
@@ -24,6 +25,7 @@ postsRouter.post(
 
 postsRouter.get("/posts", validateToken, getPosts);
 
+postsRouter.get("/posts/:id/comments", validateToken, getPostComments);
 postsRouter.post(
   "/posts/:id/comments",
   validateToken,

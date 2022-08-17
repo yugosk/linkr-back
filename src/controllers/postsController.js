@@ -1,17 +1,20 @@
 import urlMetadata from "url-metadata";
 
 import {
+  findPost,
   createPost,
   readPosts,
   readLikes,
 } from "../repositories/postsRepository.js";
-import { checkOwner } from "../repositories/alterPostRepository.js";
 import {
   createTag,
   createTagsPosts,
   readTags,
 } from "../repositories/tagsRepository.js";
-import { createComment } from "../repositories/commentsRepository.js";
+import {
+  getComments,
+  createComment,
+} from "../repositories/commentsRepository.js";
 
 export async function newPost(req, res) {
   const { url, description } = res.locals.sanitezedBody;
@@ -112,6 +115,23 @@ export async function getPosts(req, res) {
   }
 }
 
+export async function getPostComments(req, res) {
+  const { id: postId } = req.params;
+  const { userId } = res.locals;
+
+  try {
+    const { rowCount } = await findPost(postId);
+
+    if (rowCount === 0) {
+      return res.status(404).send("Post does not exist");
+    }
+
+    const { rows: comments } = await getComments(userId, postId);
+
+    res.status(200).send(comments);
+  } catch {}
+}
+
 export async function createNewComment(req, res) {
   const { id: postId } = req.params;
   const {
@@ -120,17 +140,16 @@ export async function createNewComment(req, res) {
   } = res.locals;
 
   try {
-    const post = await checkOwner(Number(postId));
+    const { rowCount } = await findPost(postId);
 
-    if (!post) {
+    if (rowCount === 0) {
       return res.status(404).send("Post does not exist");
     }
 
     await createComment(postId, userId, text);
 
     res.status(201).send();
-  } catch (err) {
-    console.log(err);
+  } catch {
     res.status(500).send("Error while creating new comment");
   }
 }
