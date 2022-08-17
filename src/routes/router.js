@@ -14,8 +14,8 @@ router.use("/", authRouter);
 router.use("/", tagsRouter);
 router.use("/", postsRouter);
 router.use("/users", usersRouter);
-router.use("/",alterPostRouter);
-router.use("/",userPostsRouter);
+router.use("/", alterPostRouter);
+router.use("/", userPostsRouter);
 router.use("/", likesRouter);
 
 export default router;

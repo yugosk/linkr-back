@@ -1,14 +1,17 @@
+import urlMetadata from "url-metadata";
+
 import {
   createPost,
   readPosts,
   readLikes,
 } from "../repositories/postsRepository.js";
+import { checkOwner } from "../repositories/alterPostRepository.js";
 import {
   createTag,
   createTagsPosts,
   readTags,
 } from "../repositories/tagsRepository.js";
-import urlMetadata from "url-metadata";
+import { createComment } from "../repositories/commentsRepository.js";
 
 export async function newPost(req, res) {
   const { url, description } = res.locals.sanitezedBody;
@@ -106,5 +109,28 @@ export async function getPosts(req, res) {
   } catch (error) {
     console.error(error);
     res.sendStatus(500);
+  }
+}
+
+export async function createNewComment(req, res) {
+  const { id: postId } = req.params;
+  const {
+    userId,
+    sanitezedBody: { text },
+  } = res.locals;
+
+  try {
+    const post = await checkOwner(Number(postId));
+
+    if (!post) {
+      return res.status(404).send("Post does not exist");
+    }
+
+    await createComment(postId, userId, text);
+
+    res.status(201).send();
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error while creating new comment");
   }
 }
