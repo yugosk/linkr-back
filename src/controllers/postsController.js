@@ -4,6 +4,7 @@ import {
   readLikes,
   readFollowedPosts,
 } from "../repositories/postsRepository.js";
+import { findFollow } from "../repositories/followersRepository.js";
 import {
   createTag,
   createTagsPosts,
@@ -99,11 +100,18 @@ async function mapMetadata(obj, userId) {
 export async function getPosts(req, res) {
   const userId = res.locals.userId;
   try {
-    const posts = await readFollowedPosts(userId);
-    const response = await Promise.all(
-      posts.map((post) => mapMetadata(post, userId))
-    );
-    res.send(response);
+    const { rowCount: follows } = await findFollow({
+      followerId: userId,
+    });
+    if (follows === 0) {
+      res.send("This user follows no one");
+    } else {
+      const posts = await readFollowedPosts(userId);
+      const response = await Promise.all(
+        posts.map((post) => mapMetadata(post, userId))
+      );
+      res.send(response);
+    }
   } catch (error) {
     console.error(error);
     res.sendStatus(500);
