@@ -2,6 +2,7 @@ import {
   createPost,
   readPosts,
   readLikes,
+  readFollowedPosts,
 } from "../repositories/postsRepository.js";
 import {
   createTag,
@@ -98,7 +99,7 @@ async function mapMetadata(obj, userId) {
 export async function getPosts(req, res) {
   const userId = res.locals.userId;
   try {
-    const posts = await readPosts();
+    const posts = await readFollowedPosts(userId);
     const response = await Promise.all(
       posts.map((post) => mapMetadata(post, userId))
     );
