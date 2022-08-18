@@ -1,6 +1,7 @@
 //import { response } from "express";
 import { postsOfUser } from "../repositories/userPostsRepository.js";
 import { readLikes } from "../repositories/postsRepository.js";
+import urlMetadata from "url-metadata";
 
 async function mapMetadata(obj, userId) {
     const likes = await readLikes();
@@ -55,6 +56,7 @@ export async function userPage(req,res){
         const list  = await postsOfUser(id);
         const response = await Promise.all(list.map((post) => mapMetadata(post)));
         res.status(200).send(response);
+        //res.status(200).send(list);
     }
     catch(error){
         console.log(error);
