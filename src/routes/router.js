@@ -8,6 +8,7 @@ import alterPostRouter from "./alterPostRouter.js";
 import userPostsRouter from "./userPostsRouter.js";
 import likesRouter from "./likesRouter.js";
 import followersRouter from "./followersRouter.js";
+import repostsRouter from "./repostsRouter.js";
 
 const router = Router();
 
@@ -19,5 +20,6 @@ router.use("/", alterPostRouter);
 router.use("/", userPostsRouter);
 router.use("/", likesRouter);
 router.use("/followers", followersRouter);
+router.use("/", repostsRouter);
 
 export default router;
