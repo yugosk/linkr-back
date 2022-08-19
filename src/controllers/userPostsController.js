@@ -4,6 +4,7 @@ import {
   postsOfUserOffset,
 } from "../repositories/userPostsRepository.js";
 import { readLikes } from "../repositories/postsRepository.js";
+import urlMetadata from "url-metadata";
 
 async function mapMetadata(obj, userId) {
   const likes = await readLikes();
@@ -53,7 +54,7 @@ export async function userPage(req, res) {
   if (!id) {
     return res.sendStatus(404);
   }
-  id = parseInt(id);
+  id = parseInt(id);  
   const { offset } = req.query;
 
   if (offset) {

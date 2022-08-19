@@ -4,6 +4,7 @@ import {
   postsWithTagOffset,
 } from "../repositories/tagsRepository.js";
 import { readLikes } from "../repositories/postsRepository.js";
+import urlMetadata from "url-metadata";
 
 export async function trending(req, res) {
   try {
