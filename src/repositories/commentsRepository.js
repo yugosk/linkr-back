@@ -4,11 +4,10 @@ export async function getComments(userId, postId) {
   return connection.query(
     `
     SELECT c.id, u.username, c."userId", u.picture, c.text, 
-    case when f."followerId" = $1 then true else false end as "isFollowing",
+    exists (SELECT * FROM followers WHERE "followerId" = $1 AND "followedId" = c.id),
     case when p."userId" = c."userId" then true else false end as "isOwner"
     FROM comments c
     JOIN users u ON u.id = c."userId"
-    JOIN followers f ON f."followedId" = u.id
     JOIN posts p ON p.id = c."postId"
     WHERE "postId" = $2
     ORDER BY c.id

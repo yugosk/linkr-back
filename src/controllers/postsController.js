@@ -3,6 +3,7 @@ import {
   readPosts,
   readLikes,
   readOffsetPosts,
+  findPost,
 } from "../repositories/postsRepository.js";
 import { findFollow } from "../repositories/followersRepository.js";
 import {
@@ -12,6 +13,10 @@ import {
 } from "../repositories/tagsRepository.js";
 import urlMetadata from "url-metadata";
 import { readReposts } from "../repositories/repostsRepository.js";
+import {
+  getComments,
+  createComment,
+} from "../repositories/commentsRepository.js";
 
 export async function newPost(req, res) {
   const { url, description } = res.locals.sanitezedBody;
@@ -150,15 +155,22 @@ export async function getPostComments(req, res) {
   const { id: postId } = req.params;
   const { userId } = res.locals;
 
+  console.log("oi");
+
   try {
     const { rowCount } = await findPost(postId);
+
+    console.log("oi");
 
     if (rowCount === 0) {
       return res.status(404).send("Post does not exist");
     }
 
+    console.log("oi");
+
     const { rows: comments } = await getComments(userId, postId);
 
+    console.log("oi");
     res.status(200).send(comments);
   } catch {}
 }
