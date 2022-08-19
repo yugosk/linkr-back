@@ -24,11 +24,11 @@ export async function createUser(email, password, username, picture) {
 
 export async function findUsers(name, followerId) {
   return connection.query(
-    `SELECT 
-      users.id, username, picture, 
-      case when followers."followerId" = $1 then true else false end as "isFollowing" FROM users 
-    LEFT JOIN followers ON users.id = followers."followedId"
-    WHERE username ILIKE $2 
+    `
+    SELECT users.id, username, picture, 
+    EXISTS (SELECT * FROM followers WHERE "followerId" = $1 AND "followedId" = users.id) AS "isFollowing"
+    FROM users 
+    WHERE username ILIKE $2
     ORDER BY "isFollowing" DESC, username
 `,
     [followerId, `${name}%`]
