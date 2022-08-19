@@ -46,6 +46,8 @@ export async function readPosts(userId) {
   `,
     [userId]
   );
+  console.log(JSON.stringify(response[0]));
+
   return response;
 }
 
@@ -83,13 +85,14 @@ export async function readOffsetPosts(userId, offset) {
   `,
     [userId, offset]
   );
+  console.log(JSON.stringify(response[0]));
   return response;
 }
 
 export async function readLikes(postId) {
   const { rows: response } = await connection.query(
     `
-  SELECT u.username, u.id AS "userId", "postId" FROM likes
+  SELECT u.username, u.id AS "userId" FROM likes
   JOIN users u ON u.id = "userId"
   WHERE "postId" = $1
   `,
