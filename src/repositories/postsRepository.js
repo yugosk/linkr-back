@@ -23,6 +23,37 @@ export async function readPosts() {
   return response;
 }
 
+export async function readFollowedPosts(userId) {
+  const { rows: response } = await connection.query(
+    `
+  SELECT p.url, p.description, u.picture, u.username, p.id, p."userId" FROM posts p
+  JOIN users u ON u.id = p."userId"
+  JOIN followers f ON f."followedId"=p."userId"
+  WHERE "followerId" = $1 OR "followedId" = $1
+  ORDER BY p."createdAt" DESC
+  LIMIT 10
+  `,
+    [userId]
+  );
+  return response;
+}
+
+export async function readOffsetPosts(userId, offset) {
+  const { rows: response } = await connection.query(
+    `
+  SELECT p.url, p.description, u.picture, u.username, p.id, p."userId" FROM posts p
+  JOIN users u ON u.id = p."userId"
+  JOIN followers f ON f."followedId"=p."userId"
+  WHERE "followerId" = $1 OR "followedId" = $1
+  ORDER BY p."createdAt" DESC
+  OFFSET $2
+  LIMIT 10
+  `,
+    [userId, offset]
+  );
+  return response;
+}
+
 export async function readLikes() {
   const { rows: response } = await connection.query(
     `
