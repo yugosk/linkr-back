@@ -22,17 +22,15 @@ export async function createUser(email, password, username, picture) {
   );
 }
 
-export async function findUsers(name) {
-  let pattern = "";
-  const params = [];
-
-  if (name) {
-    params.push(`${name}%`);
-    pattern = "WHERE username ILIKE $1";
-  }
-
+export async function findUsers(name, followerId) {
   return connection.query(
-    `SELECT id, username, picture FROM users ${pattern} ORDER BY username`,
-    params
+    `SELECT 
+      users.id, username, picture, 
+      case when followers."followerId" = $1 then true else false end as "isFollowing" FROM users 
+    LEFT JOIN followers ON users.id = followers."followedId"
+    WHERE username ILIKE $2 
+    ORDER BY "isFollowing" DESC, username
+`,
+    [followerId, `${name}%`]
   );
 }
