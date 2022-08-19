@@ -85,7 +85,6 @@ export async function readOffsetPosts(userId, offset) {
   `,
     [userId, offset]
   );
-  console.log(JSON.stringify(response[0]));
   return response;
 }
 
