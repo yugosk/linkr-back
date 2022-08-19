@@ -2,7 +2,10 @@ import {
   createPost,
   readPosts,
   readLikes,
+  readFollowedPosts,
+  readOffsetPosts,
 } from "../repositories/postsRepository.js";
+import { findFollow } from "../repositories/followersRepository.js";
 import {
   createTag,
   createTagsPosts,
@@ -97,14 +100,75 @@ async function mapMetadata(obj, userId) {
 
 export async function getPosts(req, res) {
   const userId = res.locals.userId;
+  const { offset } = req.query;
+
+  if (offset) {
+    try {
+      const posts = await readOffsetPosts(userId, offset);
+      const response = await Promise.all(
+        posts.map((post) => mapMetadata(post, userId))
+      );
+      res.send(response);
+    } catch (error) {
+      console.error(error);
+      res.sendStatus(500);
+    }
+  } else {
+    try {
+      const { rowCount: follows } = await findFollow({
+        followerId: userId,
+      });
+      if (follows === 0) {
+        res.send("This user follows no one");
+      } else {
+        const posts = await readFollowedPosts(userId);
+        const response = await Promise.all(
+          posts.map((post) => mapMetadata(post, userId))
+        );
+        res.send(response);
+      }
+    } catch (error) {
+      console.error(error);
+      res.sendStatus(500);
+    }
+  }
+}
+
+export async function getPostComments(req, res) {
+  const { id: postId } = req.params;
+  const { userId } = res.locals;
+
   try {
-    const posts = await readPosts();
-    const response = await Promise.all(
-      posts.map((post) => mapMetadata(post, userId))
-    );
-    res.send(response);
-  } catch (error) {
-    console.error(error);
-    res.sendStatus(500);
+    const { rowCount } = await findPost(postId);
+
+    if (rowCount === 0) {
+      return res.status(404).send("Post does not exist");
+    }
+
+    const { rows: comments } = await getComments(userId, postId);
+
+    res.status(200).send(comments);
+  } catch {}
+}
+
+export async function createNewComment(req, res) {
+  const { id: postId } = req.params;
+  const {
+    userId,
+    sanitezedBody: { text },
+  } = res.locals;
+
+  try {
+    const { rowCount } = await findPost(postId);
+
+    if (rowCount === 0) {
+      return res.status(404).send("Post does not exist");
+    }
+
+    await createComment(postId, userId, text);
+
+    res.status(201).send();
+  } catch {
+    res.status(500).send("Error while creating new comment");
   }
 }
