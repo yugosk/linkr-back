@@ -1,11 +1,9 @@
-import urlMetadata from "url-metadata";
-
 import {
-  findPost,
   createPost,
   readPosts,
   readLikes,
   readFollowedPosts,
+  readOffsetPosts,
 } from "../repositories/postsRepository.js";
 import { findFollow } from "../repositories/followersRepository.js";
 import {
@@ -13,10 +11,7 @@ import {
   createTagsPosts,
   readTags,
 } from "../repositories/tagsRepository.js";
-import {
-  getComments,
-  createComment,
-} from "../repositories/commentsRepository.js";
+import urlMetadata from "url-metadata";
 
 export async function newPost(req, res) {
   const { url, description } = res.locals.sanitezedBody;
@@ -105,22 +100,37 @@ async function mapMetadata(obj, userId) {
 
 export async function getPosts(req, res) {
   const userId = res.locals.userId;
-  try {
-    const { rowCount: follows } = await findFollow({
-      followerId: userId,
-    });
-    if (follows === 0) {
-      res.send("This user follows no one");
-    } else {
-      const posts = await readFollowedPosts(userId);
+  const { offset } = req.query;
+
+  if (offset) {
+    try {
+      const posts = await readOffsetPosts(userId, offset);
       const response = await Promise.all(
         posts.map((post) => mapMetadata(post, userId))
       );
       res.send(response);
+    } catch (error) {
+      console.error(error);
+      res.sendStatus(500);
     }
-  } catch (error) {
-    console.error(error);
-    res.sendStatus(500);
+  } else {
+    try {
+      const { rowCount: follows } = await findFollow({
+        followerId: userId,
+      });
+      if (follows === 0) {
+        res.send("This user follows no one");
+      } else {
+        const posts = await readFollowedPosts(userId);
+        const response = await Promise.all(
+          posts.map((post) => mapMetadata(post, userId))
+        );
+        res.send(response);
+      }
+    } catch (error) {
+      console.error(error);
+      res.sendStatus(500);
+    }
   }
 }
 
