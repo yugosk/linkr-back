@@ -46,8 +46,6 @@ export async function readPosts(userId) {
   `,
     [userId]
   );
-  console.log(JSON.stringify(response[0]));
-
   return response;
 }
 
