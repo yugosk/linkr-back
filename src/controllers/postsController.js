@@ -11,6 +11,7 @@ import {
   readTags,
 } from "../repositories/tagsRepository.js";
 import urlMetadata from "url-metadata";
+import { readReposts } from "../repositories/repostsRepository.js";
 
 export async function newPost(req, res) {
   const { url, description } = res.locals.sanitezedBody;
@@ -55,15 +56,15 @@ export async function newPost(req, res) {
 }
 
 async function mapMetadata(obj, userId) {
-  const likes = await readLikes();
-  const postLikes = likes
-    .filter((i) => i.postId === obj.id)
-    .map((i) => {
-      return { username: i.username, userId: i.id };
-    });
+  const likes = await readLikes(obj.id);
+  const reposts = await readReposts(obj.id);
   let isLiked = false;
-  if (postLikes.find((i) => i.userId === userId)) {
+  if (likes.find((i) => i.userId === userId)) {
     isLiked = true;
+  }
+  let userReposted = false;
+  if (reposts.find((i) => i.userId === userId)) {
+    userReposted = true;
   }
   try {
     const meta = await urlMetadata(obj.url);
@@ -79,8 +80,9 @@ async function mapMetadata(obj, userId) {
       repostUsername: obj.repostUsername,
       reposts: obj.reposts,
       comments: obj.comments,
-      likes: postLikes,
+      likes,
       isLiked,
+      userReposted,
       metaTitle: meta.title,
       metaImage: meta.image,
       metaDescription: meta.description,
@@ -98,8 +100,9 @@ async function mapMetadata(obj, userId) {
       repostUsername: obj.repostUsername,
       reposts: obj.reposts,
       comments: obj.comments,
-      likes: postLikes,
+      likes,
       isLiked,
+      userReposted,
       metaTitle: "Metadata not available",
       metaImage: "Metadata not available",
       metaDescription: "Metadata not available",
