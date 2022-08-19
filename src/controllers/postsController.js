@@ -2,7 +2,6 @@ import {
   createPost,
   readPosts,
   readLikes,
-  readFollowedPosts,
   readOffsetPosts,
 } from "../repositories/postsRepository.js";
 import { findFollow } from "../repositories/followersRepository.js";
@@ -12,6 +11,7 @@ import {
   readTags,
 } from "../repositories/tagsRepository.js";
 import urlMetadata from "url-metadata";
+import { readReposts } from "../repositories/repostsRepository.js";
 
 export async function newPost(req, res) {
   const { url, description } = res.locals.sanitezedBody;
@@ -56,44 +56,56 @@ export async function newPost(req, res) {
 }
 
 async function mapMetadata(obj, userId) {
-  const likes = await readLikes();
-  const postLikes = likes
-    .filter((i) => i.postId === obj.id)
-    .map((i) => {
-      return { username: i.username, userId: i.id };
-    });
+  const likes = await readLikes(obj.id);
+  const reposts = await readReposts(obj.id);
   let isLiked = false;
-  if (postLikes.find((i) => i.userId === userId)) {
+  if (likes.find((i) => i.userId === userId)) {
     isLiked = true;
+  }
+  let userReposted = false;
+  if (reposts.find((i) => i.userId === userId)) {
+    userReposted = true;
   }
   try {
     const meta = await urlMetadata(obj.url);
     return {
       id: obj.id,
-      username: obj.username,
-      picture: obj.picture,
-      description: obj.description,
       url: obj.url,
-      postOwner: obj.userId,
+      description: obj.description,
+      postOwner: obj.postOwner,
+      picture: obj.picture,
+      username: obj.username,
+      isRepost: obj.isRepost,
+      repostOwner: obj.repostOwner,
+      repostUsername: obj.repostUsername,
+      reposts: obj.reposts,
+      comments: obj.comments,
+      likes,
+      isLiked,
+      userReposted,
       metaTitle: meta.title,
       metaImage: meta.image,
       metaDescription: meta.description,
-      likes: postLikes,
-      isLiked,
     };
   } catch {
     return {
       id: obj.id,
-      username: obj.username,
-      picture: obj.picture,
-      description: obj.description,
       url: obj.url,
-      postOwner: obj.userId,
+      description: obj.description,
+      postOwner: obj.postOwner,
+      picture: obj.picture,
+      username: obj.username,
+      isRepost: obj.isRepost,
+      repostOwner: obj.repostOwner,
+      repostUsername: obj.repostUsername,
+      reposts: obj.reposts,
+      comments: obj.comments,
+      likes,
+      isLiked,
+      userReposted,
       metaTitle: "Metadata not available",
       metaImage: "Metadata not available",
       metaDescription: "Metadata not available",
-      likes: postLikes,
-      isLiked,
     };
   }
 }
@@ -121,7 +133,7 @@ export async function getPosts(req, res) {
       if (follows === 0) {
         res.send("This user follows no one");
       } else {
-        const posts = await readFollowedPosts(userId);
+        const posts = await readPosts(userId);
         const response = await Promise.all(
           posts.map((post) => mapMetadata(post, userId))
         );
