@@ -2,7 +2,6 @@ import {
   createPost,
   readPosts,
   readLikes,
-  readFollowedPosts,
   readOffsetPosts,
 } from "../repositories/postsRepository.js";
 import { findFollow } from "../repositories/followersRepository.js";
@@ -70,30 +69,40 @@ async function mapMetadata(obj, userId) {
     const meta = await urlMetadata(obj.url);
     return {
       id: obj.id,
-      username: obj.username,
-      picture: obj.picture,
-      description: obj.description,
       url: obj.url,
+      description: obj.description,
       postOwner: obj.userId,
+      picture: obj.picture,
+      username: obj.username,
+      isRepost: obj.isRepost,
+      repostOwner: obj.repostOwner,
+      repostUsername: obj.repostUsername,
+      reposts: obj.reposts,
+      comments: obj.comments,
+      likes: postLikes,
+      isLiked,
       metaTitle: meta.title,
       metaImage: meta.image,
       metaDescription: meta.description,
-      likes: postLikes,
-      isLiked,
     };
   } catch {
     return {
       id: obj.id,
-      username: obj.username,
-      picture: obj.picture,
-      description: obj.description,
       url: obj.url,
+      description: obj.description,
       postOwner: obj.userId,
+      picture: obj.picture,
+      username: obj.username,
+      isRepost: obj.isRepost,
+      repostOwner: obj.repostOwner,
+      repostUsername: obj.repostUsername,
+      reposts: obj.reposts,
+      comments: obj.comments,
+      likes: postLikes,
+      isLiked,
       metaTitle: "Metadata not available",
       metaImage: "Metadata not available",
       metaDescription: "Metadata not available",
-      likes: postLikes,
-      isLiked,
     };
   }
 }
@@ -121,7 +130,7 @@ export async function getPosts(req, res) {
       if (follows === 0) {
         res.send("This user follows no one");
       } else {
-        const posts = await readFollowedPosts(userId);
+        const posts = await readPosts(userId);
         const response = await Promise.all(
           posts.map((post) => mapMetadata(post, userId))
         );
