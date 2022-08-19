@@ -54,7 +54,7 @@ export async function userPage(req, res) {
   if (!id) {
     return res.sendStatus(404);
   }
-  id = parseInt(id);  
+  id = parseInt(id);
   const { offset } = req.query;
 
   if (offset) {
@@ -69,6 +69,9 @@ export async function userPage(req, res) {
   } else {
     try {
       const list = await postsOfUser(id);
+      if (list.length === 1) {
+        return list;
+      }
       const response = await Promise.all(list.map((post) => mapMetadata(post)));
       res.status(200).send(response);
     } catch (error) {
